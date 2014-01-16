@@ -7482,7 +7482,7 @@ THREE.TrackballControls = function (a, c) {
             b.object.position.y = 325;
             this.rotateSpeed = .05;
         } else {
-            this.rotateSpeed = .35;
+            this.rotateSpeed = .25;
         }
         /// THIS IS SUCH A HACK //
 

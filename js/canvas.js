@@ -27,9 +27,9 @@ var soundVal = 0, oldSoundVal = 0, soundDir = 1;
 var clock = new THREE.Clock();
 
 // timing for cues (in s)
-var sunrise_time = 70.0; var has_sunrise = false;
+var sunrise_time = 90.0; var has_sunrise = false;
 var sunset_time = 190.0; var has_sunset = false;
-var birds_start = 0.0; var birds_end = 295.0; var has_birds = false; 
+var birds_start = 137.0; var birds_end = 295.0; var has_birds = false; 
 
 var morph, morphs = [];
 
@@ -69,7 +69,7 @@ function init() {
 	scene.fog.color.setHSV( 1.56, .22, .66 );
 
 	camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
-	camera.position.set( -1200, 900, 1200 );
+	camera.position.set( -1200, 300, 1200 );
 
 	scene.add( camera );
 
@@ -324,12 +324,9 @@ function init() {
 	controls = new THREE.TrackballControls( camera );
 	controls.target.set( 0, 0, 0 );
 
-	//controls.rotateSpeed = 1.0;
-	//controls.zoomSpeed = 1.2;
-	//controls.panSpeed = 0.8;
-
 	controls.noZoom = false;
 	controls.noPan = true;
+	controls.maxDistance = 1501;
 
 	controls.staticMoving = false;
 	controls.dynamicDampingFactor = 0.15;
