@@ -27,9 +27,9 @@ var soundVal = 0, oldSoundVal = 0, soundDir = 1;
 var clock = new THREE.Clock();
 
 // timing for cues (in s)
-var sunrise_time = 114.0; var has_sunrise = false;
-var sunset_time = 275.0; var has_sunset = false;
-var birds_start = 158.0; var birds_end = 314.0; var has_birds = false; 
+var sunrise_time = 70.0; var has_sunrise = false;
+var sunset_time = 190.0; var has_sunset = false;
+var birds_start = 0.0; var birds_end = 295.0; var has_birds = false; 
 
 var morph, morphs = [];
 
@@ -406,22 +406,22 @@ function init() {
 
 	var startX = -3000;
 
-	loader.load( "models/flamingo.js", function( geometry ) {
+	// loader.load( "models/flamingo.js", function( geometry ) {
 
-		morphColorsToFaceColors( geometry );
-		addMorph( geometry, 250, 500, startX -500, 500, 700 );
-		addMorph( geometry, 220, 500, startX - Math.random() * 5000, 500, -200 );
-		addMorph( geometry, 250, 500, startX - Math.random() * 5000, 500, 200 );
-		addMorph( geometry, 260, 500, startX - Math.random() * 5000, 500, 1000 );
+	// 	morphColorsToFaceColors( geometry );
+	// 	addMorph( geometry, 250, 500, startX -500, 500, 700 );
+	// 	addMorph( geometry, 220, 500, startX - Math.random() * 5000, 500, -200 );
+	// 	addMorph( geometry, 250, 500, startX - Math.random() * 5000, 500, 200 );
+	// 	addMorph( geometry, 260, 500, startX - Math.random() * 5000, 500, 1000 );
 
-	} );
+	// } );
 
 	loader.load( "models/flamingo.js", function( geometry ) {
 
 		morphColorsToFaceColors( geometry );
 
 		for (var i = 0; i < 10; i++ ) {
-			addCuedMorph( geometry, 301 - Math.random() * 100, 1000, startX - (i*200), 350, -1000 + (i*200) );
+			addCuedMorph( geometry, 301 - Math.random() * 100, 1000, startX - (i*700), 325 + Math.random() * 160, -1000 + (i*200) );
 		}
 		
 
@@ -432,7 +432,7 @@ function init() {
 		morphColorsToFaceColors( geometry );
 
 		for (var i = 0; i < 10; i++ ) {
-			addCuedMorph( geometry, 301 - Math.random() * 100, 1000, startX - (i*200), 350, -1000 + (i*200) );
+			addCuedMorph( geometry, 301 - Math.random() * 100, 1000, startX - (i*700), 325 + Math.random() * 160, -1000 + (i*200) );
 		}
 
 	} );
@@ -522,9 +522,6 @@ function startViz() {
 
 	document.getElementById( "ready" ).style.display = "none";
 
-	//console.log("muting song for testing");
-	//document.getElementById( "soundtrack" ).volume = 0.0;	
-
 	document.getElementById( "soundtrack" ).play();
 
 
@@ -568,16 +565,17 @@ function render() {
 	}
 
 	// check for cues
+	var ct = getTimeInSong();
 
 	if (!has_sunrise) {
-		if (getTimeInSong() > sunrise_time) {
+		if (ct > sunrise_time) {
 			lightDir *= -1;
 			has_sunrise = true;
 		}
 	}
 
 	if (has_sunrise && !has_sunset) {
-		if (getTimeInSong() > sunset_time) {
+		if (ct > sunset_time) {
 			console.log("sunset...");
 			lightDir *= -1;
 			has_sunset = true;
@@ -585,12 +583,12 @@ function render() {
 	}
 
 	if (!has_birds) {
-		if (getTimeInSong() > birds_start && getTimeInSong() < birds_end) {
+		if (ct > birds_start && ct < birds_end) {
 			console.log("birds starting");
 			has_birds = true;
 		}
 	} if (has_birds) {
-		if (getTimeInSong() > birds_end) {
+		if (ct > birds_end) {
 			has_birds = false;
 			console.log("birds ending");
 		}
@@ -610,7 +608,7 @@ function render() {
 
 		var time = Date.now() * 0.001;
 
-		var fLow = 0.05; fHigh = 0.550;
+		var fLow = 0.05; fHigh = 0.850;
 
 		lightVal = THREE.Math.clamp( lightVal + 0.005 * delta * lightDir, fLow, fHigh );
 
@@ -674,23 +672,22 @@ function render() {
 		}
 
 
-		//just restarts every time......... how to trigger a flock at a specific cue?
-		for ( var i = 0; i < morphs.length; i ++ ) {
+		// for ( var i = 0; i < morphs.length; i ++ ) {
 
-			morph = morphs[ i ];
+		// 	morph = morphs[ i ];
 
-			morph.updateAnimation( 250 * delta );
+		// 	morph.updateAnimation( 250 * delta );
 
-			morph.position.x += morph.speed * delta;
+		// 	morph.position.x += morph.speed * delta;
 
-			if ( morph.position.x  > 2500 )  {
+		// 	if ( morph.position.x  > 2500 )  {
 
-				morph.position.x = -1500 - Math.random() * 1000;
+		// 		morph.position.x = -1500 - Math.random() * 1000;
 
-			}
+		// 	}
 
 
-		}
+		// }
 
 		//renderer.render( scene, camera );
 		composer.render( 0.1 );
