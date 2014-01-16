@@ -7410,6 +7410,7 @@ THREE.TrackballControls = function (a, c) {
     this.keys = [65, 83, 68];
     this.target =
         new THREE.Vector3(0, 0, 0);
+    this.isSparkletime = false;
     var g = !1,
         e = d.NONE,
         f = new THREE.Vector3,
@@ -7475,16 +7476,20 @@ THREE.TrackballControls = function (a, c) {
             b.panCamera();
         b.object.position.add(b.target, f);
 
-        /// THIS IS SUCH A HACK //
-        // trying to keep cam above terrain, 
-        // and make sure it doesn't jump around too fast (that kills it)
-        if (b.object.position.y < 325) {
-            b.object.position.y = 325;
-            this.rotateSpeed = .05;
-        } else {
-            this.rotateSpeed = .25;
+        if (!this.isSparkletime) {
+            /// THIS IS SUCH A HACK //
+            // trying to keep cam above terrain, 
+            // and make sure it doesn't jump around too fast (that kills it)
+            if (b.object.position.y < 325) {
+                b.object.position.y = 325;
+                this.rotateSpeed = .05;
+            } else {
+                this.rotateSpeed = .25;
+            }
+            /// THIS IS SUCH A HACK //
         }
-        /// THIS IS SUCH A HACK //
+
+        // during sparkeltime, of course we want full movement
 
         b.checkDistances();
         b.object.lookAt(b.target)

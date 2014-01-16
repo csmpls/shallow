@@ -30,6 +30,7 @@ var clock = new THREE.Clock();
 var sunrise_time = 90.0; var has_sunrise = false;
 var sunset_time = 190.0; var has_sunset = false;
 var birds_start = 137.0; var birds_end = 295.0; var has_birds = false; 
+var sparkletown_start = 327.0; var sparkletown = false;
 
 var morph, morphs = [];
 
@@ -69,7 +70,7 @@ function init() {
 	scene.fog.color.setHSV( 1.56, .22, .66 );
 
 	camera = new THREE.PerspectiveCamera( 40, SCREEN_WIDTH / SCREEN_HEIGHT, 2, 4000 );
-	camera.position.set( -1200, 300, 1200 );
+	camera.position.set( -1200, 400, 1200 );
 
 	scene.add( camera );
 
@@ -239,9 +240,8 @@ function init() {
 
     // particle system
     particles = new THREE.ParticleSystem( particles_geometry, material );
-    //particleSystem.sortParticles = true; // ???
 
-    //scene.add( particles );
+
 
 
 	// RENDERER
@@ -326,7 +326,7 @@ function init() {
 
 	controls.noZoom = false;
 	controls.noPan = true;
-	controls.maxDistance = 1501;
+	controls.maxDistance = 2000;
 
 	controls.staticMoving = false;
 	controls.dynamicDampingFactor = 0.15;
@@ -591,15 +591,30 @@ function render() {
 		}
 	}
 
-	//rotate entire particle system
+	if (!sparkletown) { // has_sunset && 
+		if (ct > sparkletown_start) {
+			sparkletown = true;
+			scene.add(particles);
+			controls.isSparkletime = true;
+			controls.rotateSpeed = .7;
+			// controls.dynamicDampingFactor = .14;
+			camera.position.set( 30, -1200, -60 );
+		}
+	}
 
-    particles.rotation.x += 0.0015;
-    particles.rotation.y += 0.0005;
+	if ( sparkletown ){
 
+		controls.update();
 
+		//rotate entire particle system
+	    particles.rotation.x += 0.0015;
+	    particles.rotation.y += 0.0005;
 
+	    composer.render( 0.1 );
+
+	}
 	
-	if ( terrain.visible ) {
+	else if ( terrain.visible ) {
 
 		controls.update();
 
