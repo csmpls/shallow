@@ -6,7 +6,7 @@ var MARGIN = 100;
 var SCREEN_WIDTH = window.innerWidth;
 var SCREEN_HEIGHT = window.innerHeight - 2 * MARGIN;
 
-var renderer, container, stats;
+var renderer, container;
 
 var camera, scene;
 var cameraOrtho, sceneRenderTarget;
@@ -18,19 +18,26 @@ var uniformsNoise, uniformsNormal,
 var spotLight, pointLight;
 
 var terrain;
-var particles;
+var particles, inner_particles;
 
 var animDelta = 0, animDeltaDir = 1;
 var lightVal = 0, lightDir = -1;
 var soundVal = 0, oldSoundVal = 0, soundDir = 1;
+var opac = 0.7;
 
 var clock = new THREE.Clock();
 
 // timing for cues (in s)
-var sunrise_time = 90.0; var has_sunrise = false;
-var sunset_time = 190.0; var has_sunset = false;
+var sunrise_time = 50.0; var has_sunrise = false;
+var sunset_time = 194.0; var has_sunset = false;
 var birds_start = 137.0; var birds_end = 295.0; var has_birds = false; 
 var sparkletown_start = 327.0; var sparkletown = false;
+var sparkletown2_start = 352.1; var sparkletown2 = false;
+var fadeout_start = 360; var fadeout = false;
+var end_time = 370;
+
+
+
 
 var morph, morphs = [];
 
@@ -210,6 +217,7 @@ function init() {
 	
 	// particle system geometry
     var particles_geometry = new THREE.SphereGeometry( 700, 700, 20 );
+    var inner_particles_geometry = new THREE.SphereGeometry( 100, 100, 20 );
     
     // vertex colors
     var particles_colors = [];
@@ -222,6 +230,7 @@ function init() {
 
     }
     particles_geometry.colors = particles_colors;
+    inner_particles_geometry.colors = particles_colors;
 
     // texture
     var particles_texture = new THREE.Texture( generateParticleTexture( ) );
@@ -240,6 +249,7 @@ function init() {
 
     // particle system
     particles = new THREE.ParticleSystem( particles_geometry, material );
+    inner_particles = new THREE.ParticleSystem( inner_particles_geometry, material );
 
 
 
@@ -262,16 +272,6 @@ function init() {
 	renderer.gammaOutput = true;
 
 
-	// STATS
-
-	stats = new Stats();
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.top = '0px';
-	container.appendChild( stats.domElement );
-
-	stats.domElement.children[ 0 ].children[ 0 ].style.color = "#aaa";
-	stats.domElement.children[ 0 ].style.background = "transparent";
-	stats.domElement.children[ 0 ].children[ 1 ].style.display = "none";
 
 	// EVENTS
 
@@ -401,24 +401,24 @@ function init() {
 
 	var loader = new THREE.JSONLoader();
 
-	var startX = -3000;
+	var startX = -3500;
 
-	// loader.load( "models/flamingo.js", function( geometry ) {
+	loader.load( "models/flamingo.js", function( geometry ) {
 
-	// 	morphColorsToFaceColors( geometry );
-	// 	addMorph( geometry, 250, 500, startX -500, 500, 700 );
-	// 	addMorph( geometry, 220, 500, startX - Math.random() * 5000, 500, -200 );
-	// 	addMorph( geometry, 250, 500, startX - Math.random() * 5000, 500, 200 );
-	// 	addMorph( geometry, 260, 500, startX - Math.random() * 5000, 500, 1000 );
+	 	morphColorsToFaceColors( geometry );
+	 	addMorph( geometry, 250, 500, startX -500, 500, 700 );
+	 	addMorph( geometry, 220, 500, startX - Math.random() * 5000, 500, -200 );
+	 	addMorph( geometry, 250, 500, startX - Math.random() * 5000, 500, 200 );
+	 	addMorph( geometry, 260, 500, startX - Math.random() * 5000, 500, 1000 );
 
-	// } );
+	 } );
 
 	loader.load( "models/flamingo.js", function( geometry ) {
 
 		morphColorsToFaceColors( geometry );
 
 		for (var i = 0; i < 10; i++ ) {
-			addCuedMorph( geometry, 301 - Math.random() * 100, 1000, startX - (i*700), 325 + Math.random() * 160, -1000 + (i*200) );
+			addCuedMorph( geometry, 301 - Math.random() * 100, 1000, startX - (i*1000), 325 + Math.random() * 160, -1000 + (i*200) );
 		}
 		
 
@@ -469,12 +469,13 @@ function onKeyDown ( event ) {
 
 	switch( event.keyCode ) {
 
-		case 78: /*N*/  lightDir *= -1; break;
-		case 77: /*M*/  animDeltaDir *= -1; break;
 		case 66: /*B*/  var songtime = console.log(getTimeInSong()); break;
 		case 70: /*f*/  if( THREEx.FullScreen.activated() ){
+
+				  document.getElementById("fs").style.visibility="visible";
 				  THREEx.FullScreen.cancel();
 				}else{
+				  document.getElementById("fs").style.visibility="hidden";
 				  THREEx.FullScreen.request();
 				} break;
 
@@ -521,6 +522,8 @@ function startViz() {
 
 	document.getElementById( "soundtrack" ).play();
 
+	document.getElementById("fs").style.visibility="visible";
+
 
 }
 
@@ -537,7 +540,6 @@ function animate() {
     }, 1000 / 18 );
 
 	render();
-	stats.update();
 
 
 
@@ -599,7 +601,27 @@ function render() {
 			controls.rotateSpeed = .7;
 			// controls.dynamicDampingFactor = .14;
 			camera.position.set( 30, -1200, -60 );
+		
+			//remove th birds and terrain
+			scene.remove(terrain);
+			for ( var i = 0; i < morphs.length; i ++ ) {
+				scene.remove(morphs[i]);
+			}
+			for ( var i = 0; i < cued_morphs.length; i ++ ) {
+				scene.remove(cued_morphs[i]);
+			}
 		}
+	}
+	
+	if (!sparkletown2) {
+		if (ct > sparkletown2_start) {
+			scene.add(inner_particles);
+			sparkletown2 = true;
+		}
+	}
+	
+	if (ct > fadeout_start) {
+		fadeout = true;
 	}
 
 	if ( sparkletown ){
@@ -609,6 +631,28 @@ function render() {
 		//rotate entire particle system
 	    particles.rotation.x += 0.0015;
 	    particles.rotation.y += 0.0005;
+
+		if (sparkletown2) {
+			// and the inner system
+		    inner_particles.rotation.x -= 0.0007;
+		    inner_particles.rotation.y += 0.0020;
+		}
+
+	if (fadeout) {
+		opac = opac - 0.0025;
+		if (opac > 0) {
+			particles.material.opacity = opac;
+			inner_particles.material.opacity = opac;
+		} else {
+			// we're all done - fade in message.
+			document.getElementById("container").style.display="none";
+			document.getElementById("endmessage").style.display="block";
+			fadeout = false;
+			
+		}
+	}
+
+	
 
 	    composer.render( 0.1 );
 
@@ -684,22 +728,22 @@ function render() {
 		}
 
 
-		// for ( var i = 0; i < morphs.length; i ++ ) {
+		for ( var i = 0; i < morphs.length; i ++ ) {
 
-		// 	morph = morphs[ i ];
+		 	morph = morphs[ i ];
 
-		// 	morph.updateAnimation( 250 * delta );
+		 	morph.updateAnimation( 250 * delta );
 
-		// 	morph.position.x += morph.speed * delta;
+		 	morph.position.x += morph.speed * delta;
 
-		// 	if ( morph.position.x  > 2500 )  {
+		 	if ( morph.position.x  > 2500 )  {
 
-		// 		morph.position.x = -1500 - Math.random() * 1000;
+		 		morph.position.x = -1500 - Math.random() * 1000;
 
-		// 	}
+		 	}
 
 
-		// }
+		 }
 
 		//renderer.render( scene, camera );
 		composer.render( 0.1 );

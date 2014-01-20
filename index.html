@@ -25,9 +25,18 @@
 
         <button onclick="startViz()">play</button> <br>
 
-        <i>"shallow" by <a href="http://seaoleena.bandcamp.com">sea oleena</a>. video by <a href="http://cosmopol.is/">nick merrill</a>, with <a href="http://cosmopol.is/charlotte/credits/" target="_blank">many thanks.</a>  you should turn the lights out.</i>
+        <i>"shallow" by <a href="http://seaoleena.bandcamp.com">sea oleena</a>. video by <a href="http://cosmopol.is/">nick merrill</a>, with <a href="http://cosmopol.is/charlotte/credits/" target="_blank">many thanks.</a> </i>
 
     </div>
+
+<div id="fs">
+	press <i>f</i> for fullscreen 
+</div> 
+
+
+<div id = "endmessage">
+	thanks for listening. we hope you enjoyed this. check out all of <i>shallow</i> <a href="http://seaoleena.bandcamp.com">on bandcamp</a>. feel free to <a href="javascript:history.go(0)">watch again</a>. 
+</div>
 
 
     <script id ="texture-precache">
@@ -51,7 +60,6 @@
     <script src="js/ThreeTerrain.js"></script>
     <script src="js/Detector.js"></script>
     <script src="js/RequestAnimationFrame.js"></script>
-    <script src="js/Stats.js"></script>
 
     <script src="js/ShaderTerrain.js"></script>
     <script src="js/ShaderExtrasTerrain.js"></script>
@@ -66,7 +74,6 @@
         <script src="js/canvas.js"></script>    
 
         <script id = "showing">
-
         Pace.on('done', function() {
             document.getElementById( "loading" ).style.display = "none";
 
