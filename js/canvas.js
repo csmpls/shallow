@@ -316,8 +316,8 @@ function init() {
 	composer.addPass( effectBloom );
 	composer.addPass( effectBleach );
 
-	composer.addPass( hblur );
-	composer.addPass( vblur );
+	// composer.addPass( hblur );
+	// composer.addPass( vblur );
 
 
 	//CONTROLS
